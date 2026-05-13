@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { ShieldCheck, Bug, Activity, Sparkles } from "lucide-react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
-import { StatsCards } from "@/components/dashboard/stats-cards";
+import { StatsCards, type StatItem } from "@/components/dashboard/stats-cards";
 import { UsageChart } from "@/components/dashboard/usage-chart";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
 import {
@@ -19,33 +18,33 @@ export const metadata: Metadata = {
 };
 
 export default function AnalyticsPage() {
-  const stats = [
+  const stats: StatItem[] = [
     {
       label: "Reviews (90d)",
       value: 1842,
       delta: 18,
-      icon: Sparkles,
+      icon: "Sparkles",
       hint: "vs. prev. 90d",
     },
     {
       label: "Issues caught",
       value: 9034,
       delta: 11,
-      icon: Bug,
+      icon: "Bug",
       hint: "vs. prev. 90d",
     },
     {
       label: "Critical resolved",
       value: 138,
       delta: 42,
-      icon: ShieldCheck,
+      icon: "ShieldCheck",
       hint: "vs. prev. 90d",
     },
     {
       label: "Avg. fix time",
       value: "21m",
       delta: -14,
-      icon: Activity,
+      icon: "Activity",
       hint: "vs. prev. 90d",
     },
   ];

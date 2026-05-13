@@ -1,15 +1,50 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDownRight, ArrowUpRight, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  Bug,
+  CreditCard,
+  Github,
+  GitPullRequestArrow,
+  LayoutDashboard,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn, formatNumber } from "@/lib/utils";
+
+/**
+ * Server-safe icon registry. Pages (Server Components) pass an icon *name*
+ * (a string), this Client Component resolves it to the actual lucide
+ * forwardRef component. This avoids the "Functions cannot be passed directly
+ * to Client Components" RSC serialization error.
+ */
+const ICON_REGISTRY = {
+  Activity,
+  Bug,
+  CreditCard,
+  Github,
+  GitPullRequestArrow,
+  LayoutDashboard,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Zap,
+} satisfies Record<string, LucideIcon>;
+
+export type StatIconName = keyof typeof ICON_REGISTRY;
 
 export interface StatItem {
   label: string;
   value: number | string;
   delta?: number;
-  icon: LucideIcon;
+  icon: StatIconName;
   hint?: string;
 }
 
@@ -22,6 +57,7 @@ export function StatsCards({ items }: StatsCardsProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((stat, i) => {
         const positive = (stat.delta ?? 0) >= 0;
+        const Icon = ICON_REGISTRY[stat.icon];
         return (
           <motion.div
             key={stat.label}
@@ -66,7 +102,7 @@ export function StatsCards({ items }: StatsCardsProps) {
                   ) : null}
                 </div>
                 <div className="grid h-10 w-10 place-items-center rounded-md bg-primary/10 text-primary">
-                  <stat.icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                 </div>
               </CardContent>
             </Card>

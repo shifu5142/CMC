@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Activity, Bug, ShieldCheck, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
-import { StatsCards } from "@/components/dashboard/stats-cards";
+import { StatsCards, type StatItem } from "@/components/dashboard/stats-cards";
 import { UsageChart } from "@/components/dashboard/usage-chart";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { RecentReviews } from "@/components/dashboard/recent-reviews";
@@ -21,33 +21,33 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  const stats = [
+  const stats: StatItem[] = [
     {
       label: "Reviews this month",
       value: 248,
       delta: 12,
-      icon: Sparkles,
+      icon: "Sparkles",
       hint: "vs. last month",
     },
     {
       label: "Issues caught",
       value: 1342,
       delta: 8,
-      icon: Bug,
+      icon: "Bug",
       hint: "vs. last month",
     },
     {
       label: "Critical findings",
       value: 18,
       delta: -22,
-      icon: ShieldCheck,
+      icon: "ShieldCheck",
       hint: "vs. last month",
     },
     {
       label: "Avg. review time",
       value: "3.2s",
       delta: -5,
-      icon: Activity,
+      icon: "Activity",
       hint: "vs. last month",
     },
   ];
