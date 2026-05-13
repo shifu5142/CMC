@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Sign up",
 };
 
-export default function SignUpPage() {
+function SignUpPage() {
   return (
     <main className="relative grid min-h-screen place-items-center px-4">
       <div className="pointer-events-none absolute inset-0 bg-spotlight" />
@@ -40,3 +40,5 @@ export default function SignUpPage() {
     </main>
   );
 }
+
+export default SignUpPage;

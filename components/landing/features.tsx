@@ -45,7 +45,7 @@ const FEATURES = [
   },
 ];
 
-export function Features() {
+function Features() {
   return (
     <section id="features" className="relative py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -78,3 +78,5 @@ export function Features() {
     </section>
   );
 }
+
+export default Features;

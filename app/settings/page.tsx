@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Settings",
 };
 
-export default function SettingsPage() {
+function SettingsPage() {
   return (
     <DashboardShell
       title="Settings"
@@ -16,3 +16,5 @@ export default function SettingsPage() {
     </DashboardShell>
   );
 }
+
+export default SettingsPage;

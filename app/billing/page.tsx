@@ -43,7 +43,7 @@ const INVOICES = [
   },
 ];
 
-export default function BillingPage() {
+function BillingPage() {
   const currentPlan = PRICING_PLANS.find((p) => p.id === "pro")!;
   const usedReviews = 184;
   const totalReviews = 500;
@@ -157,3 +157,5 @@ export default function BillingPage() {
     </DashboardShell>
   );
 }
+
+export default BillingPage;

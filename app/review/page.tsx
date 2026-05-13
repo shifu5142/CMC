@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Paste or upload code and have CodePilot review it for security, performance, bugs, and refactors.",
 };
 
-export default function ReviewPage() {
+function ReviewPage() {
   return (
     <DashboardShell
       title="AI Code Review"
@@ -20,3 +20,5 @@ export default function ReviewPage() {
     </DashboardShell>
   );
 }
+
+export default ReviewPage;

@@ -12,7 +12,7 @@ const LOGOS = [
   "Cursor",
 ];
 
-export function LogoCloud() {
+function LogoCloud() {
   return (
     <section className="border-y border-border/60 bg-card/30 py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,3 +39,5 @@ export function LogoCloud() {
     </section>
   );
 }
+
+export default LogoCloud;

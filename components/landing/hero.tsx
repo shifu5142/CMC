@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Github, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function Hero() {
+function Hero() {
   return (
     <section className="relative isolate overflow-hidden">
       <div
@@ -108,3 +108,5 @@ export function Hero() {
     </section>
   );
 }
+
+export default Hero;

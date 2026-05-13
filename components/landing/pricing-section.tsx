@@ -1,8 +1,7 @@
 import { SectionHeading } from "@/components/ui/section-heading";
-import { PricingCards } from "@/components/landing/pricing-cards";
+import PricingCards from "@/components/landing/pricing-cards";
 
-export function PricingSection() {
-  return (
+function PricingSection() {  return (
     <section className="py-24" id="pricing">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
@@ -17,3 +16,5 @@ export function PricingSection() {
     </section>
   );
 }
+
+export default PricingSection;

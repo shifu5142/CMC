@@ -32,7 +32,7 @@ const FOOTER_GROUPS = [
   },
 ];
 
-export function Footer() {
+function Footer() {
   return (
     <footer className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -71,3 +71,5 @@ export function Footer() {
     </footer>
   );
 }
+
+export default Footer;

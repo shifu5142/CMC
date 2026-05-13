@@ -10,7 +10,7 @@ import { MAIN_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/useUIStore";
 
-export function Navbar() {
+function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const setCommand = useUIStore((s) => s.setCommandMenuOpen);
@@ -119,3 +119,5 @@ export function Navbar() {
     </motion.header>
   );
 }
+
+export default Navbar;

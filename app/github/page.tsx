@@ -32,7 +32,7 @@ const STATUS_BADGE = {
   draft: "secondary" as const,
 };
 
-export default function GitHubPage() {
+function GitHubPage() {
   return (
     <DashboardShell
       title="GitHub"
@@ -168,3 +168,5 @@ export default function GitHubPage() {
     </DashboardShell>
   );
 }
+
+export default GitHubPage;

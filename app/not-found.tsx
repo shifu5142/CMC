@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
 
-export default function NotFound() {
+function NotFound() {
   return (
     <main className="relative grid min-h-[70vh] place-items-center px-4">
       <div className="pointer-events-none absolute inset-0 bg-spotlight" />
@@ -31,3 +31,5 @@ export default function NotFound() {
     </main>
   );
 }
+
+export default NotFound;

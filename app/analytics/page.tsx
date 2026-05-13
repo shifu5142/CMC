@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Analytics",
 };
 
-export default function AnalyticsPage() {
+function AnalyticsPage() {
   const stats: StatItem[] = [
     {
       label: "Reviews (90d)",
@@ -108,3 +108,5 @@ export default function AnalyticsPage() {
     </DashboardShell>
   );
 }
+
+export default AnalyticsPage;

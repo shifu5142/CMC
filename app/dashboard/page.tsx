@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Dashboard",
 };
 
-export default function DashboardPage() {
+function DashboardPage() {
   const stats: StatItem[] = [
     {
       label: "Reviews this month",
@@ -83,3 +83,5 @@ export default function DashboardPage() {
     </DashboardShell>
   );
 }
+
+export default DashboardPage;

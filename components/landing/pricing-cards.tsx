@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { billingService } from "@/services/billingService";
 import { toast } from "sonner";
 
-export function PricingCards({
+function PricingCards({
   variant = "section",
 }: {
   variant?: "section" | "page";
@@ -99,3 +99,5 @@ export function PricingCards({
     </div>
   );
 }
+
+export default PricingCards;

@@ -3,7 +3,7 @@
 import { AlertTriangle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function RootError({
+function RootError({
   error,
   reset,
 }: {
@@ -36,3 +36,5 @@ export default function RootError({
     </main>
   );
 }
+
+export default RootError;

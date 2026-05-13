@@ -6,7 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Card } from "@/components/ui/card";
 import { mockTestimonials } from "@/lib/mock-data";
 
-export function Testimonials() {
+function Testimonials() {
   return (
     <section className="py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -51,3 +51,5 @@ export function Testimonials() {
     </section>
   );
 }
+
+export default Testimonials;

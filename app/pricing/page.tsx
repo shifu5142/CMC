@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { PricingCards } from "@/components/landing/pricing-cards";
+import PricingCards from "@/components/landing/pricing-cards";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -29,7 +29,7 @@ const FAQ = [
   },
 ];
 
-export default function PricingPage() {
+function PricingPage() {
   return (
     <>
       <Navbar />
@@ -73,3 +73,5 @@ export default function PricingPage() {
     </>
   );
 }
+
+export default PricingPage;

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Team",
 };
 
-export default function TeamPage() {
+function TeamPage() {
   return (
     <DashboardShell
       title="Team"
@@ -19,6 +19,8 @@ export default function TeamPage() {
     </DashboardShell>
   );
 }
+
+export default TeamPage;
 
 function InviteButton() {
   return (
