@@ -1,26 +1,60 @@
 {
-  "name": "cmc-ai",
+  "name": "codepilot-ai",
   "version": "0.1.0",
   "private": true,
+  "description": "CodePilot AI — AI-powered code review SaaS platform.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "@clerk/nextjs": "^6.12.0",
+    "mongoose": "^8.8.0",
+    "openai": "^4.69.0",
+    "stripe": "^17.4.0",
+    "@stripe/stripe-js": "^4.10.0",
+    "uploadthing": "^7.4.0",
+    "@uploadthing/react": "^7.1.0",
+    "zustand": "^5.0.1",
+    "framer-motion": "^11.11.0",
+    "recharts": "^2.13.0",
+    "lucide-react": "^0.460.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4",
+    "class-variance-authority": "^0.7.1",
+    "cmdk": "^1.0.4",
+    "sonner": "^1.7.0",
+    "zod": "^3.23.8",
+    "@monaco-editor/react": "^4.6.0",
+    "react-syntax-highlighter": "^15.6.1",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.1.4",
+    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-progress": "^1.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tailwindcss-animate": "^1.0.7"
   }
 }
