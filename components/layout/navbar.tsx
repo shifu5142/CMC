@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { Menu, X, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,20 +64,15 @@ export function Navbar() {
               ⌘K
             </kbd>
           </Button>
-          <SignedOut>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/sign-up">Get started</Link>
-            </Button>
-          </SignedOut>
-          <SignedIn>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/sign-up">Get started</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard">Dashboard</Link>
+          </Button>
         </div>
 
         <button
@@ -109,19 +103,15 @@ export function Navbar() {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-3">
-              <SignedOut>
-                <Button asChild variant="outline">
-                  <Link href="/sign-in">Sign in</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/sign-up">Get started</Link>
-                </Button>
-              </SignedOut>
-              <SignedIn>
-                <Button asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-              </SignedIn>
+              <Button asChild variant="outline">
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/sign-up">Get started</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
             </div>
           </div>
         </div>
