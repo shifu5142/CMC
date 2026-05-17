@@ -54,7 +54,7 @@ export function IssueCard({ issue, index = 0 }: IssueCardProps) {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1.5 text-sm text-muted-foreground">
+              <p className="mt-1.5 whitespace-pre-wrap text-sm text-muted-foreground">
                 {issue.description}
               </p>
 

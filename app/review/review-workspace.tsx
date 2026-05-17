@@ -16,10 +16,44 @@ import { CodeEditor } from "@/components/review/code-editor";
 import { LanguageSelect } from "@/components/review/language-select";
 import { UploadArea } from "@/components/review/upload-area";
 import { ResultsPanel } from "@/components/review/results-panel";
+import { uid } from "@/lib/utils";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useUIStore } from "@/store/useUIStore";
-import { reviewService } from "@/services/reviewService";
+import type { ReviewResult } from "@/types";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+function reviewFromAiResponse(result: {
+  review: string;
+  filename: string;
+  language: string;
+  reviewedAt: string;
+}): ReviewResult {
+  return {
+    id: uid("rev"),
+    language: result.language,
+    filename: result.filename,
+    createdAt: result.reviewedAt,
+    summary: result.filename,
+    highlights: [],
+    metrics: {
+      score: 0,
+      security: 0,
+      performance: 0,
+      maintainability: 0,
+      estimatedFixTime: 0,
+    },
+    issues: [
+      {
+        id: uid("issue"),
+        title: "AI Review",
+        description: result.review,
+        category: "style",
+        severity: "info",
+      },
+    ],
+  };
+}
 export function ReviewWorkspace() {
   const code = useReviewStore((s) => s.code);
   const setCode = useReviewStore((s) => s.setCode);
@@ -50,15 +84,31 @@ export function ReviewWorkspace() {
     setStatus("loading");
     setCurrent(null);
     try {
-      const result = await reviewService.run({ code, language, filename });
-      setCurrent(result);
-      pushHistory(result);
-      setStatus("success");
-      toast.success("Review complete");
+      const result = await fetch(`${BASE_URL}/review`, {
+        method: "POST",
+        body: JSON.stringify({ code, language, filename }),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await result.json();
+      console.log(data);
+      if (data.success) {
+        setCurrent(data.result.text);
+        pushHistory(data.result.text);
+        setStatus("success");
+        toast.success("Review complete");
+      } else {
+        console.error(data.message);
+        setStatus("error");
+        toast.error(data.message ?? "Could not run review");
+      }
     } catch (err) {
-      setStatus("error", err instanceof Error ? err.message : "Failed");
-      setRateLimitHits((n) => n + 1);
+      console.error(err);
       toast.error("Could not run review");
+      setStatus("error");
+      setRateLimitHits((n) => n + 1);
     }
   }
 

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
+  onGithubSignIn?: () => void | Promise<void>;
 }
 
 /**
@@ -17,7 +18,7 @@ interface AuthFormProps {
  * user on the dashboard. Swap with Clerk's `<SignIn />` / `<SignUp />` once
  * keys are configured.
  */
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, onGithubSignIn }: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +46,10 @@ export function AuthForm({ mode }: AuthFormProps) {
         variant="outline"
         className="w-full"
         onClick={() => {
+          if (mode === "sign-in" && onGithubSignIn) {
+            void onGithubSignIn();
+            return;
+          }
           toast.info("OAuth is mocked — landing on dashboard.");
           router.push("/dashboard");
         }}
