@@ -51,7 +51,7 @@ function SignUpPage() {
           message: "Registered successfully.",
         });
         setTimeout(() => {
-          router.push("/login");
+          router.push("/sign-in");
         }, 1500);
       }
          else {

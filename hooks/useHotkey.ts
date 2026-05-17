@@ -19,13 +19,19 @@ export function useHotkey(
   handler: (e: KeyboardEvent) => void,
 ) {
   useEffect(() => {
+    if (!key) return;
+
     const onKey = (e: KeyboardEvent) => {
-      const isMod = mod ? e.metaKey || e.ctrlKey : true;
-      const isShift = shift ? e.shiftKey : true;
-      if (e.key.toLowerCase() === key.toLowerCase() && isMod && isShift) {
-        e.preventDefault();
-        handler(e);
-      }
+      const pressed = e.key?.toLowerCase();
+      const target = key.toLowerCase();
+      if (!pressed || pressed !== target) return;
+
+      const isMod = mod ? e.metaKey || e.ctrlKey : !e.metaKey && !e.ctrlKey;
+      const isShift = shift ? e.shiftKey : !e.shiftKey;
+      if (!isMod || !isShift) return;
+
+      e.preventDefault();
+      handler(e);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

@@ -93,6 +93,7 @@ export function ReviewWorkspace() {
         },
       });
       const data = await result.json();
+
       console.log(data);
       if (data.success) {
         setCurrent(data.result.text);

@@ -12,8 +12,8 @@ const firebaseConfig = {
   projectId: "planplan-c8971",
   storageBucket: "planplan-c8971.firebasestorage.app",
   messagingSenderId: "76461613958",
-  appId: "1:76461613958:web:896fe13c5df0b087160207",
-  measurementId: "G-QW3K8JJ6V2"
+  appId: "1:76461613958:web:491825f5f12b74e4160207",
+  measurementId: "G-9N6M1JKQRB"
 };
 
 // Initialize Firebase
@@ -23,3 +23,6 @@ const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
 export { auth, googleProvider, githubProvider };
+
+
+// Initialize Firebase

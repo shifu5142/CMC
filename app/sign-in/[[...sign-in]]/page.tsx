@@ -35,6 +35,7 @@ function SignInPage() {
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
       const token = await user.getIdToken();
+      console.log(user);
       const response = await fetch("/api/sign-in", {
         method: "POST",
         body: JSON.stringify({
