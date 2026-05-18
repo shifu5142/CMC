@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -24,14 +25,18 @@ export function AuthForm({ mode, onGithubSignIn }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [loginFeedback, setLoginFeedback] = useState<
+    null | { success: true } | { success: false; message: string }
+  >(null);
   const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const submit = async (e: React.FormEvent) => {
-    
     e.preventDefault();
+    setLoginFeedback(null);
     if (!email.includes("@") || password.length < 4) {
       toast.error("Please enter a valid email and password.");
       return;
     }
+    setSubmitting(true);
     try {
       const result = await fetch(`${BASE_URL}/sign-in`, {
         method: "POST",
@@ -39,11 +44,16 @@ export function AuthForm({ mode, onGithubSignIn }: AuthFormProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-
       });
       const data = await result.json();
       if (data.success) {
-        localStorage.setItem("token", data.data.token);
+        const token = data.data?.token ?? data.token;
+        if (!token) {
+          toast.error(data.message ?? "Sign in failed: no token returned");
+          return;
+        }
+        localStorage.setItem("token", token);
+        setLoginFeedback({ success: true });
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
@@ -52,11 +62,29 @@ export function AuthForm({ mode, onGithubSignIn }: AuthFormProps) {
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={submit} className="mt-5 space-y-3">
+      {loginFeedback ? (
+        <div
+          role="alert"
+          className={cn(
+            "rounded-lg border px-3 py-2.5 text-sm font-medium animate-fade-in",
+            loginFeedback.success
+              ? "border-emerald-500/45 bg-emerald-500/10 text-emerald-100"
+              : "border-red-500/45 bg-red-500/10 text-red-100",
+          )}
+        >
+          {loginFeedback.success
+            ? "Successfully logged in"
+            : loginFeedback.message}
+        </div>
+      ) : null}
+
       <Button
         type="button"
         variant="outline"

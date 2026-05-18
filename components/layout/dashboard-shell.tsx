@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, Bell, Sparkles, LogOut, User as UserIcon, Settings as SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +16,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUIStore } from "@/store/useUIStore";
-import { mockUser } from "@/lib/mock-data";
+import { useUserStore } from "@/store/useUserStore";
 import { getInitials } from "@/lib/utils";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -30,8 +34,56 @@ export function DashboardShell({
   description,
   actions,
 }: DashboardShellProps) {
+  const router = useRouter();
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
   const setChatOpen = useUIStore((s) => s.setChatOpen);
+  const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
+  const resetUser = useUserStore((s) => s.reset);
+
+  useEffect(() => {
+    async function checkToken() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/sign-in");
+        return;
+      }
+      try {
+        const response = await fetch(`${BASE_URL}/dashboard`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        if (data.success) {
+          setUser({
+            id: String(data.data.id),
+            name: data.data.name,
+            email: data.data.email,
+            plan: "free",
+            role: "owner",
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          router.push("/sign-in");
+        }
+      } catch (error) {
+        console.error(error);
+        router.push("/sign-in");
+      }
+    }
+    checkToken();
+  }, [router, setUser]);
+
+  const displayName = user?.name ?? "Account";
+  const displayEmail = user?.email ?? "";
+
+  function signOut() {
+    localStorage.removeItem("token");
+    resetUser();
+    router.push("/sign-in");
+  }
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -74,10 +126,7 @@ export function DashboardShell({
                   aria-label="Open user menu"
                 >
                   <Avatar className="h-8 w-8">
-                    {mockUser.imageUrl ? (
-                      <AvatarImage src={mockUser.imageUrl} alt={mockUser.name} />
-                    ) : null}
-                    <AvatarFallback>{getInitials(mockUser.name)}</AvatarFallback>
+                    <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
@@ -85,10 +134,10 @@ export function DashboardShell({
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-foreground">
-                      {mockUser.name}
+                      {displayName}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {mockUser.email}
+                      {displayEmail}
                     </span>
                   </div>
                 </DropdownMenuLabel>
@@ -106,11 +155,9 @@ export function DashboardShell({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/">
-                    <LogOut className="size-4" />
-                    Sign out
-                  </Link>
+                <DropdownMenuItem onClick={signOut}>
+                  <LogOut className="size-4" />
+                  Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

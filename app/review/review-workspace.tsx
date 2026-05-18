@@ -23,40 +23,41 @@ import type { ReviewResult } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-function reviewFromAiResponse(result: {
-  text: string;
+function reviewFromBackendResponse(result: {
+  description: string;
+  code: string;
   filename: string;
   language: string;
   reviewedAt: string;
 }): ReviewResult {
-  const titleMatch = result.text.match(
+  const description = result.description ?? "";
+  const titleMatch = description.match(
     /(?:#{1,3}\s*)?Title:\s*(.+?)(?:\r?\n|$)/i,
   );
-  const title = titleMatch?.[1]?.trim() ?? result.filename;
+  const issueCount = (description.match(/^\d+\.\s/gm) ?? []).length;
+  const findings = issueCount || 1;
+  const hasSecurity = /security|injection|vulnerabilit/i.test(description);
+  const hasPerformance = /performance|slow|n\+1/i.test(description);
 
   return {
     id: uid("rev"),
     language: result.language,
     filename: result.filename,
     createdAt: result.reviewedAt,
-    summary: title,
+    summary:
+      titleMatch?.[1]?.trim() ??
+      `Found ${findings} improvement${findings === 1 ? "" : "s"} in this review.`,
     highlights: [],
     metrics: {
-      score: 80,
-      security: 80,
-      performance: 80,
-      maintainability: 80,
-      estimatedFixTime: 0,
+      score: Math.max(58, 94 - findings * 7),
+      security: hasSecurity ? 64 : 86,
+      performance: hasPerformance ? 72 : 84,
+      maintainability: Math.max(70, 88 - findings * 3),
+      estimatedFixTime: findings * 15,
     },
-    issues: [
-      {
-        id: uid("issue"),
-        title: "AI Review",
-        description: result.text,
-        category: "style",
-        severity: "info",
-      },
-    ],
+    issues: [],
+    reviewDescription: result.description,
+    reviewCode: result.code,
   };
 }
 export function ReviewWorkspace() {
@@ -99,8 +100,8 @@ export function ReviewWorkspace() {
         },
       });
       const data = await result.json();
-      if (data.success && data.result?.text) {
-        const reviewResult = reviewFromAiResponse(data.result);
+      if (data.success && data.result?.description) {
+        const reviewResult = reviewFromBackendResponse(data.result);
         setCurrent(reviewResult);
         pushHistory(reviewResult);
         setStatus("success");

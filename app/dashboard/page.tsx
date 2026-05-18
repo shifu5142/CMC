@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
-import type { Metadata } from "next";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { StatsCards, type StatItem } from "@/components/dashboard/stats-cards";
 import { UsageChart } from "@/components/dashboard/usage-chart";
@@ -15,10 +14,6 @@ import {
   mockTrend,
 } from "@/lib/mock-data";
 import { AIChat } from "@/components/review/ai-chat";
-
-export const metadata: Metadata = {
-  title: "Dashboard",
-};
 
 function DashboardPage() {
   const stats: StatItem[] = [

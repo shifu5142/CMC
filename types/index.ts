@@ -85,6 +85,10 @@ export interface ReviewResult {
   highlights: string[];
   metrics: ReviewMetrics;
   issues: ReviewIssue[];
+  /** AI review narrative from backend `/review`. */
+  reviewDescription?: string;
+  /** Suggested fixed code from backend `/review`. */
+  reviewCode?: string;
 }
 
 export interface ReviewRequestPayload {
