@@ -17,7 +17,6 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useUserStore } from "@/store/useUserStore";
-import { mockUser } from "@/lib/mock-data";
 import { uid } from "@/lib/utils";
 
 interface ApiKey {
@@ -28,6 +27,7 @@ interface ApiKey {
 }
 
 export function SettingsTabs() {
+  const user = useUserStore((s) => s.user);
   const preferences = useUserStore((s) => s.preferences);
   const setPreference = useUserStore((s) => s.setPreference);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -71,11 +71,14 @@ export function SettingsTabs() {
               Update how CodePilot displays your account.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" defaultValue={mockUser.name} />
-            <Field label="Email" defaultValue={mockUser.email} type="email" />
-            <Field label="Company" defaultValue="Acme Inc." />
-            <Field label="Role" defaultValue="Engineering" />
+          <CardContent
+            key={user?.id ?? "profile"}
+            className="grid gap-4 sm:grid-cols-2"
+          >
+            <Field label="Full name" defaultValue={user?.name ?? ""} />
+            <Field label="Email" defaultValue={user?.email ?? ""} type="email" />
+            <Field label="Company" defaultValue="" />
+            <Field label="Role" defaultValue="" />
             <div className="sm:col-span-2 flex justify-end">
               <Button onClick={() => toast.success("Profile saved")}>
                 Save changes
