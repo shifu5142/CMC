@@ -24,19 +24,35 @@ export function AuthForm({ mode, onGithubSignIn }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
+  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
   const submit = async (e: React.FormEvent) => {
+    
     e.preventDefault();
     if (!email.includes("@") || password.length < 4) {
       toast.error("Please enter a valid email and password.");
       return;
     }
-    setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 500));
-    toast.success(
-      mode === "sign-in" ? "Signed in (mock)" : "Account created (mock)",
-    );
-    router.push("/dashboard");
+    try {
+      const result = await fetch(`${BASE_URL}/sign-in`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+
+      });
+      const data = await result.json();
+      if (data.success) {
+        localStorage.setItem("token", data.data.token);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   return (

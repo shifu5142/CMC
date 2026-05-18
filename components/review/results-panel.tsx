@@ -22,8 +22,13 @@ interface ResultsPanelProps {
   loading?: boolean;
 }
 
+function getIssues(result: ReviewResult) {
+  return Array.isArray(result.issues) ? result.issues : [];
+}
+
 export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   const [filter, setFilter] = useState<"all" | IssueCategory>("all");
+  const issues = result ? getIssues(result) : [];
 
   const counts = useMemo(() => {
     if (!result) return null;
@@ -34,9 +39,9 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
       low: 0,
       info: 0,
     };
-    for (const i of result.issues) bySeverity[i.severity] += 1;
+    for (const i of issues) bySeverity[i.severity] += 1;
     return bySeverity;
-  }, [result]);
+  }, [result, issues]);
 
   if (loading) {
     return (
@@ -64,16 +69,14 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   }
 
   const filtered =
-    filter === "all"
-      ? result.issues
-      : result.issues.filter((i) => i.category === filter);
+    filter === "all" ? issues : issues.filter((i) => i.category === filter);
 
   return (
     <Card glass className="overflow-hidden">
       <CardHeader className="gap-2">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-5">
-            <ScoreIndicator score={result.metrics.score} />
+            <ScoreIndicator score={result.metrics?.score ?? 0} />
             <div>
               <CardTitle className="text-base">
                 {result.filename ?? "Review result"}
@@ -104,11 +107,11 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
           </div>
 
           <div className="grid w-full max-w-xs gap-2.5">
-            <Metric label="Security" value={result.metrics.security} />
-            <Metric label="Performance" value={result.metrics.performance} />
+            <Metric label="Security" value={result.metrics?.security ?? 0} />
+            <Metric label="Performance" value={result.metrics?.performance ?? 0} />
             <Metric
               label="Maintainability"
-              value={result.metrics.maintainability}
+              value={result.metrics?.maintainability ?? 0}
             />
           </div>
         </div>
@@ -123,7 +126,7 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
             <TabsList>
               <TabsTrigger value="all">
                 <ListFilter className="size-3.5" />
-                All ({result.issues.length})
+                All ({issues.length})
               </TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
               <TabsTrigger value="performance">Performance</TabsTrigger>

@@ -24,30 +24,35 @@ import type { ReviewResult } from "@/types";
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 function reviewFromAiResponse(result: {
-  review: string;
+  text: string;
   filename: string;
   language: string;
   reviewedAt: string;
 }): ReviewResult {
+  const titleMatch = result.text.match(
+    /(?:#{1,3}\s*)?Title:\s*(.+?)(?:\r?\n|$)/i,
+  );
+  const title = titleMatch?.[1]?.trim() ?? result.filename;
+
   return {
     id: uid("rev"),
     language: result.language,
     filename: result.filename,
     createdAt: result.reviewedAt,
-    summary: result.filename,
+    summary: title,
     highlights: [],
     metrics: {
-      score: 0,
-      security: 0,
-      performance: 0,
-      maintainability: 0,
+      score: 80,
+      security: 80,
+      performance: 80,
+      maintainability: 80,
       estimatedFixTime: 0,
     },
     issues: [
       {
         id: uid("issue"),
         title: "AI Review",
-        description: result.review,
+        description: result.text,
         category: "style",
         severity: "info",
       },
@@ -84,25 +89,24 @@ export function ReviewWorkspace() {
     setStatus("loading");
     setCurrent(null);
     try {
+      const token = localStorage.getItem("token");
       const result = await fetch(`${BASE_URL}/review`, {
         method: "POST",
         body: JSON.stringify({ code, language, filename }),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
       const data = await result.json();
-
-      console.log(data);
-      if (data.success) {
-        setCurrent(data.result.text);
-        pushHistory(data.result.text);
+      if (data.success && data.result?.text) {
+        const reviewResult = reviewFromAiResponse(data.result);
+        setCurrent(reviewResult);
+        pushHistory(reviewResult);
         setStatus("success");
         toast.success("Review complete");
       } else {
-        console.error(data.message);
-        setStatus("error");
+        setStatus("error", data.message);
         toast.error(data.message ?? "Could not run review");
       }
     } catch (err) {
