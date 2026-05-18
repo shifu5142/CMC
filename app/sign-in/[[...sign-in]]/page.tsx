@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, githubProvider } from "@/app/services/auth/firebaseConfig";
 import { AuthForm } from "@/app/sign-in/auth-form";
@@ -17,7 +17,38 @@ type LoginFeedback =
 function SignInPage() {
   const router = useRouter();
   const [loginFeedback, setLoginFeedback] = useState<LoginFeedback>(null);
+  useEffect(() => {
+    async function checkToken() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/sign-in`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
+        if (data.success) {
+          setLoginFeedback({
+            success: true,
+            message: "Already logged in",
+          });
+          window.setTimeout(() => {
+            router.push("/dashboard");
+          }, 1500);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    checkToken();
+  }, [router]);
   const handleLoginSuccess = (token: string) => {
     localStorage.setItem("token", token);
     setLoginFeedback({
