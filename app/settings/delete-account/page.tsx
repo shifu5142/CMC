@@ -1,16 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
+import { AlertTriangle, Loader2, Trash2, ShieldAlert } from "lucide-react";
 import NotFound from "@/app/not-found";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +27,7 @@ function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+      className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground/70"
     >
       {children}
     </label>
@@ -42,10 +36,15 @@ function FieldLabel({
 
 function PageLoadingIndicator() {
   return (
-    <Loader2
-      className="size-8 animate-spin text-muted-foreground"
-      aria-label="Loading"
-    />
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2
+          className="size-6 animate-spin text-muted-foreground"
+          aria-label="Loading"
+        />
+        <span className="text-xs text-muted-foreground">Loading...</span>
+      </div>
+    </div>
   );
 }
 
@@ -146,11 +145,7 @@ function DeletePage() {
   };
 
   if (!tokenChecked) {
-    return (
-      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center">
-        <PageLoadingIndicator />
-      </div>
-    );
+    return <PageLoadingIndicator />;
   }
 
   if (!hasToken) {
@@ -158,30 +153,39 @@ function DeletePage() {
   }
 
   return (
-    <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background p-4 sm:p-6">
+      {/* Subtle gradient overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,color-mix(in_oklch,var(--destructive),transparent_88%),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(220,38,38,0.08),transparent)]"
       />
-      <Card className="relative w-full max-w-md border-destructive/30 shadow-lg ring-1 ring-destructive/10 transition-shadow duration-300 hover:shadow-xl">
-        <CardHeader className="space-y-2">
-          <div className="flex items-center gap-2 text-destructive">
-            <span className="flex size-10 items-center justify-center rounded-lg bg-destructive/10 shadow-inner ring-1 ring-destructive/20 transition-transform duration-200 hover:scale-105">
-              <Trash2 className="size-5" aria-hidden />
-            </span>
-            <CardTitle className="text-xl">Delete User</CardTitle>
+      
+      {/* Main container */}
+      <div className="relative z-10 w-full max-w-[420px]">
+        {/* Header section */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-destructive/10 ring-1 ring-destructive/20">
+            <ShieldAlert className="size-8 text-destructive" aria-hidden />
           </div>
-          <CardDescription className="flex items-start gap-2 text-muted-foreground">
-            <AlertTriangle
-              className="mt-0.5 size-4 shrink-0 text-warning"
-              aria-hidden
-            />
-            This action is permanent. Enter your credentials to confirm
-            deletion.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleDelete} className="space-y-4">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Delete Account
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            This action is permanent and cannot be undone.
+          </p>
+        </div>
+
+        {/* Warning banner */}
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-500" aria-hidden />
+          <p className="text-sm leading-relaxed text-amber-200/80">
+            All your data, settings, and account information will be permanently removed.
+          </p>
+        </div>
+
+        {/* Form card */}
+        <div className="rounded-2xl border border-border/50 bg-card/50 p-6 shadow-xl shadow-black/5 backdrop-blur-sm">
+          <form onSubmit={handleDelete} className="space-y-5">
             <div className="space-y-2">
               <FieldLabel htmlFor="delete-username">Username</FieldLabel>
               <Input
@@ -189,9 +193,9 @@ function DeletePage() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder="Enter your username"
                 required
-                className="transition-shadow duration-200 focus-visible:shadow-sm"
+                className="h-11 rounded-xl border-border/50 bg-background/50 px-4 text-sm transition-all placeholder:text-muted-foreground/50 focus:border-destructive/50 focus:ring-destructive/20"
               />
             </div>
 
@@ -202,9 +206,9 @@ function DeletePage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Enter your password"
                 required
-                className="transition-shadow duration-200 focus-visible:shadow-sm"
+                className="h-11 rounded-xl border-border/50 bg-background/50 px-4 text-sm transition-all placeholder:text-muted-foreground/50 focus:border-destructive/50 focus:ring-destructive/20"
               />
             </div>
 
@@ -217,36 +221,65 @@ function DeletePage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
+                placeholder="Confirm your password"
                 required
-                className="transition-shadow duration-200 focus-visible:shadow-sm"
+                className="h-11 rounded-xl border-border/50 bg-background/50 px-4 text-sm transition-all placeholder:text-muted-foreground/50 focus:border-destructive/50 focus:ring-destructive/20"
               />
             </div>
 
-            <Button
-              type="submit"
-              variant="destructive"
-              className="w-full shadow-sm transition-all duration-200 hover:shadow-md active:scale-[0.98]"
-            >
-              Delete User
-            </Button>
-            {successMessage ? (
+            <div className="space-y-3 pt-2">
+              <Button
+                type="submit"
+                variant="destructive"
+                className="h-11 w-full rounded-xl text-sm font-medium shadow-lg shadow-destructive/25 transition-all hover:shadow-destructive/40 active:scale-[0.98]"
+              >
+                <Trash2 className="mr-2 size-4" />
+                Delete My Account
+              </Button>
+              
+         
+            </div>
+
+            {successMessage && (
               <div
                 role="alert"
-                className={cn(
-                  "rounded-lg border border-emerald-500/45 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-100 animate-fade-in",
-                )}
+                className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400"
               >
+                <div className="size-1.5 rounded-full bg-emerald-400" />
                 {successMessage}
               </div>
-            ) : null}
-            {errorMessage ? (
-              <p className="text-sm text-destructive">{errorMessage}</p>
-            ) : null}
+            )}
+            
+            {errorMessage && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              >
+                <div className="size-1.5 rounded-full bg-destructive" />
+                {errorMessage}
+              </div>
+            )}
           </form>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="mt-3 text-center">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-muted-foreground  hover:text-primary transition-colors"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <ShieldAlert className="size-4" />
+                    Back to dashboard
+                  </span>
+             
+                </Link>
+              </div>
+        {/* Footer text */}
+        <p className="mt-6 text-center text-xs text-muted-foreground/60">
+          Need help? Contact support before proceeding.
+        </p>
+      </div>
 
+      {/* Confirmation Dialog */}
       <Dialog
         open={isConfirmOpen}
         onOpenChange={(open) => {
@@ -254,15 +287,22 @@ function DeletePage() {
           if (!open) setConfirmError("");
         }}
       >
-        <DialogContent className="max-w-[280px] animate-in fade-in-0 zoom-in-95 p-4 shadow-xl duration-200">
-          <DialogHeader>
-            <DialogTitle>Final confirmation</DialogTitle>
-            <DialogDescription>
-              To confirm account deletion, enter <strong>confirm</strong>.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-[340px] gap-0 overflow-hidden rounded-2xl border-border/50 p-0 shadow-2xl">
+          <div className="border-b border-border/50 bg-destructive/5 px-6 py-5">
+            <DialogHeader className="space-y-2">
+              <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-xl bg-destructive/10 ring-1 ring-destructive/20">
+                <AlertTriangle className="size-5 text-destructive" />
+              </div>
+              <DialogTitle className="text-center text-lg font-semibold">
+                Final Confirmation
+              </DialogTitle>
+              <DialogDescription className="text-center text-sm leading-relaxed">
+                Type <span className="font-mono font-semibold text-foreground">confirm</span> to permanently delete your account.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <form onSubmit={handleFinalDelete} className="space-y-4">
+          <form onSubmit={handleFinalDelete} className="space-y-4 p-6">
             <div className="space-y-2">
               <FieldLabel htmlFor="delete-final-confirm">
                 Confirmation
@@ -274,18 +314,26 @@ function DeletePage() {
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder='Type "confirm"'
                 autoFocus
-                className="transition-shadow duration-200 focus-visible:shadow-sm"
+                className="h-11 rounded-xl border-border/50 bg-background/50 px-4 text-sm transition-all placeholder:text-muted-foreground/50 focus:border-destructive/50 focus:ring-destructive/20"
               />
             </div>
-            {confirmError ? (
-              <p className="text-sm text-destructive">{confirmError}</p>
-            ) : null}
+            
+            {confirmError && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              >
+                <div className="size-1.5 rounded-full bg-destructive" />
+                {confirmError}
+              </div>
+            )}
+            
             <Button
               type="submit"
               variant="destructive"
-              className="w-full transition-all duration-200 active:scale-[0.98]"
+              className="h-11 w-full rounded-xl text-sm font-medium shadow-lg shadow-destructive/25 transition-all hover:shadow-destructive/40 active:scale-[0.98]"
             >
-              Confirm Delete
+              Confirm Deletion
             </Button>
           </form>
         </DialogContent>
@@ -295,3 +343,4 @@ function DeletePage() {
 }
 
 export default DeletePage;
+

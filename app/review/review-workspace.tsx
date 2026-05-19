@@ -16,28 +16,37 @@ import { CodeEditor } from "@/components/review/code-editor";
 import { LanguageSelect } from "@/components/review/language-select";
 import { UploadArea } from "@/components/review/upload-area";
 import { ResultsPanel } from "@/components/review/results-panel";
-import { uid } from "@/lib/utils";
+import { clamp, uid } from "@/lib/utils";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useUIStore } from "@/store/useUIStore";
 import type { ReviewResult } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-function reviewFromBackendResponse(result: {
+type BackendReviewResult = {
   description: string;
   code: string;
+  security?: number;
+  performance?: number;
+  maintainability?: number;
+  score?: number;
   filename: string;
   language: string;
   reviewedAt: string;
-}): ReviewResult {
+};
+
+function metricValue(value: number | undefined, fallback: number) {
+  if (typeof value !== "number" || Number.isNaN(value)) return fallback;
+  return clamp(Math.round(value), 0, 100);
+}
+
+function reviewFromBackendResponse(result: BackendReviewResult): ReviewResult {
   const description = result.description ?? "";
   const titleMatch = description.match(
     /(?:#{1,3}\s*)?Title:\s*(.+?)(?:\r?\n|$)/i,
   );
   const issueCount = (description.match(/^\d+\.\s/gm) ?? []).length;
   const findings = issueCount || 1;
-  const hasSecurity = /security|injection|vulnerabilit/i.test(description);
-  const hasPerformance = /performance|slow|n\+1/i.test(description);
 
   return {
     id: uid("rev"),
@@ -49,10 +58,10 @@ function reviewFromBackendResponse(result: {
       `Found ${findings} improvement${findings === 1 ? "" : "s"} in this review.`,
     highlights: [],
     metrics: {
-      score: Math.max(58, 94 - findings * 7),
-      security: hasSecurity ? 64 : 86,
-      performance: hasPerformance ? 72 : 84,
-      maintainability: Math.max(70, 88 - findings * 3),
+      score: metricValue(result.score, 70),
+      security: metricValue(result.security, 70),
+      performance: metricValue(result.performance, 70),
+      maintainability: metricValue(result.maintainability, 70),
       estimatedFixTime: findings * 15,
     },
     issues: [],
@@ -100,7 +109,7 @@ export function ReviewWorkspace() {
         },
       });
       const data = await result.json();
-      if (data.success && data.result?.description) {
+      if (data.success && data.result) {
         const reviewResult = reviewFromBackendResponse(data.result);
         setCurrent(reviewResult);
         pushHistory(reviewResult);
