@@ -1,11 +1,11 @@
 import type { NavLink, PricingPlan } from "@/types";
 
 export const SITE = {
-  name: "CodePilot AI",
-  shortName: "CodePilot",
-  tagline: "AI code review on autopilot.",
+  name: "CMC",
+  shortName: "CMC",
+  tagline: "Check your code for errors and vulnerabilities.",
   description:
-    "CodePilot AI catches security issues, performance regressions, and bugs in every PR — before your team does.",
+    "CMC helps you check your code for errors, security issues, and vulnerabilities.",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://codepilot.ai",
   twitter: "@codepilotai",
   email: "hello@codepilot.ai",

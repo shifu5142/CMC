@@ -6,7 +6,7 @@ import { AIChat } from "@/components/review/ai-chat";
 export const metadata: Metadata = {
   title: "AI Code Review",
   description:
-    "Paste or upload code and have CodePilot review it for security, performance, bugs, and refactors.",
+    "Paste or upload code and have CMC review it for security, performance, bugs, and refactors.",
 };
 
 function ReviewPage() {

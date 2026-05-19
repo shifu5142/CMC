@@ -46,7 +46,7 @@ export function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
           <DialogTitle>Invite teammate</DialogTitle>
           <DialogDescription>
             They&apos;ll receive an email with a link to join your team on
-            CodePilot.
+            CMC.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 pt-2">

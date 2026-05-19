@@ -50,7 +50,7 @@ function DashboardPage() {
   return (
     <DashboardShell
       title="Welcome back"
-      description="Here's what CodePilot has been up to."
+      description="Here's what CMC has been up to."
       actions={
         <Button asChild>
           <Link href="/review">

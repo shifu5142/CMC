@@ -44,7 +44,7 @@ function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg"
         >
-          CodePilot reviews every PR for security flaws, performance
+          CMC reviews every PR for security flaws, performance
           regressions, and refactor opportunities — in seconds, with the
           context of a senior engineer.
         </motion.p>
@@ -92,7 +92,7 @@ function Hero() {
                   <span className="text-emerald-300">string</span>) {"{"}
                   {"\n"}  <span className="text-violet-400">const</span> sql ={" "}
                   <span className="text-amber-300">{"`SELECT * FROM users WHERE email = '${email}'`"}</span>
-                  ;{"\n"}  <span className="text-rose-400">// ⚠ CodePilot: potential SQL injection (CWE-89)</span>
+                  ;{"\n"}  <span className="text-rose-400">// ⚠ CMC: potential SQL injection (CWE-89)</span>
                   {"\n"}  <span className="text-violet-400">return</span> db.query(sql);
                   {"\n"}{"}"}
                 </code>

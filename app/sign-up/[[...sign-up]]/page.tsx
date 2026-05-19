@@ -82,7 +82,7 @@ function SignUpPage() {
             Create your account
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Start reviewing code with CodePilot AI.
+            Start reviewing code with CMC.
           </p>
 
           {registerFeedback ? (

@@ -280,7 +280,7 @@ export const mockActivity: ActivityEvent[] = [
   {
     id: "act_1",
     type: "review.completed",
-    actor: { name: "CodePilot", avatar: undefined },
+    actor: { name: "CMC", avatar: undefined },
     message: "Review completed on `src/server/users.ts` — score 78",
     meta: { score: 78 },
     createdAt: new Date(Date.now() - 1000 * 60 * 6).toISOString(),
@@ -406,7 +406,7 @@ export const mockChat: ChatMessage[] = [
 export const mockTestimonials = [
   {
     quote:
-      "CodePilot caught a credential leak in our auth service the day we installed it. It paid for itself in 24 hours.",
+      "CMC caught a credential leak in our auth service the day we installed it. It paid for itself in 24 hours.",
     name: "Maya Chen",
     role: "Staff Engineer, Vercel",
     avatar: "https://avatars.githubusercontent.com/u/8?v=4",
@@ -420,7 +420,7 @@ export const mockTestimonials = [
   },
   {
     quote:
-      "We replaced three internal linters with CodePilot. Our SOC2 audit was a non-event.",
+      "We replaced three internal linters with CMC. Our SOC2 audit was a non-event.",
     name: "Priya Raman",
     role: "Head of Security, Notion",
     avatar: "https://avatars.githubusercontent.com/u/10?v=4",

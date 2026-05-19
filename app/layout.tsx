@@ -18,20 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
+    default: SITE.name,
     template: `%s · ${SITE.name}`,
   },
   description: SITE.description,
-  keywords: [
-    "AI code review",
-    "code review",
-    "GitHub",
-    "static analysis",
-    "security",
-    "Next.js",
-    "TypeScript",
-    "developer tools",
-  ],
   authors: [{ name: SITE.name }],
   creator: SITE.name,
   openGraph: {
@@ -58,8 +48,9 @@ export const metadata: Metadata = {
     images: ["/og.png"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: "/CMC-ICON.png", type: "image/png" }],
+    shortcut: "/CMC-ICON.png",
+    apple: "/CMC-ICON.png",
   },
   robots: { index: true, follow: true },
 };

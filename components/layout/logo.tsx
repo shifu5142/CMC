@@ -1,5 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { SITE } from "@/lib/constants";
 
 interface LogoProps {
   href?: string;
@@ -16,31 +18,18 @@ export function Logo({ href = "/", className, iconOnly = false }: LogoProps) {
         "group inline-flex items-center gap-2 text-foreground",
         className,
       )}
-      aria-label="CodePilot AI"
+      aria-label={SITE.name}
     >
-      <span
-        aria-hidden
-        className="relative grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-violet-500 via-fuchsia-500 to-sky-500 shadow-[0_0_24px_-6px_hsl(263_85%_65%/0.7)]"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="14"
-          height="14"
-          className="text-white"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="8 6 2 12 8 18" />
-          <polyline points="16 6 22 12 16 18" />
-        </svg>
-      </span>
+      <Image
+        src="/CMC-ICON.png"
+        alt=""
+        width={28}
+        height={28}
+        className="h-7 w-7 shrink-0 rounded-md object-contain"
+        priority
+      />
       {iconOnly ? null : (
-        <span className="text-sm font-semibold tracking-tight">
-          CodePilot<span className="text-muted-foreground"> AI</span>
-        </span>
+        <span className="text-sm font-semibold tracking-tight">{SITE.name}</span>
       )}
     </Link>
   );

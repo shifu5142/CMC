@@ -52,7 +52,7 @@ function AnalyticsPage() {
   return (
     <DashboardShell
       title="Analytics"
-      description="How CodePilot is making your codebase healthier over time."
+      description="How CMC is making your codebase healthier over time."
     >
       <StatsCards items={stats} />
 

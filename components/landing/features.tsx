@@ -52,7 +52,7 @@ function Features() {
         <SectionHeading
           eyebrow="Features"
           title="Reviews that actually catch things"
-          description="Static linters check style. CodePilot checks intent."
+          description="Static linters check style. CMC checks intent."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

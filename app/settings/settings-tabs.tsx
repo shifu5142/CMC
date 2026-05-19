@@ -133,7 +133,7 @@ export function SettingsTabs() {
           <CardHeader>
             <CardTitle>Profile</CardTitle>
             <CardDescription>
-              Update how CodePilot displays your account.
+              Update how CMC displays your account.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -214,7 +214,7 @@ export function SettingsTabs() {
             <div>
               <CardTitle>API keys</CardTitle>
               <CardDescription>
-                Programmatic access to CodePilot — keep these secret.
+                Programmatic access to CMC — keep these secret.
               </CardDescription>
             </div>
             <Button size="sm" onClick={createKey}>

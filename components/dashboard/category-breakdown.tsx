@@ -32,7 +32,7 @@ export function CategoryBreakdown({ data }: { data: CategoryDatum[] }) {
     <Card glass>
       <CardHeader>
         <CardTitle className="text-base">Issues by category</CardTitle>
-        <CardDescription>Where CodePilot is finding things.</CardDescription>
+        <CardDescription>Where CMC is finding things.</CardDescription>
       </CardHeader>
       <CardContent className="h-[220px] p-2 pb-0">
         <ResponsiveContainer width="100%" height="100%">

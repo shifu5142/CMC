@@ -24,7 +24,7 @@ export function AIChat() {
       id: uid("msg"),
       role: "assistant",
       content:
-        "Hey, I'm CodePilot. Ask me about any issue, request a fix, or have me explain a finding.",
+        "Hey, I'm CMC. Ask me about any issue, request a fix, or have me explain a finding.",
       createdAt: new Date().toISOString(),
     },
   ]);
@@ -76,7 +76,7 @@ export function AIChat() {
                 <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/15 text-primary">
                   <Sparkles className="size-3.5" />
                 </span>
-                <span className="text-sm font-semibold">Ask CodePilot</span>
+                <span className="text-sm font-semibold">Ask CMC</span>
               </div>
               <Button
                 variant="ghost"
@@ -122,7 +122,7 @@ export function AIChat() {
                 </div>
               ))}
               {pending ? (
-                <p className="text-xs text-muted-foreground">CodePilot is thinking…</p>
+                <p className="text-xs text-muted-foreground">CMC is thinking…</p>
               ) : null}
             </div>
 

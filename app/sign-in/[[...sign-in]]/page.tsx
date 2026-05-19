@@ -106,7 +106,7 @@ function SignInPage() {
             Welcome back
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sign in to your CodePilot account.
+            Sign in to your CMC account.
           </p>
 
           {loginFeedback ? (
