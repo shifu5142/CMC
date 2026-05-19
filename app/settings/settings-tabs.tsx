@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Copy, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -16,8 +17,16 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useTheme } from "@/components/layout/theme-provider";
 import { useUserStore } from "@/store/useUserStore";
-import { uid } from "@/lib/utils";
+import { cn, uid } from "@/lib/utils";
 
 interface ApiKey {
   id: string;
@@ -27,11 +36,15 @@ interface ApiKey {
 }
 
 export function SettingsTabs() {
-  const user = useUserStore((s) => s.user);
   const preferences = useUserStore((s) => s.preferences);
   const setPreference = useUserStore((s) => s.setPreference);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-
+  const { theme, setTheme } = useTheme();
+  const [name, setname] = useState<string>("");
+  const [email, setemail] = useState<string>("");
+  const [company, setcompany] = useState<string>("");
+  const [role, setrole] = useState<"user" | "admin">("user");
+  const [profileSaved, setProfileSaved] = useState(false);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const [keys, setKeys] = useState<ApiKey[]>([
     {
       id: "key_1",
@@ -40,6 +53,28 @@ export function SettingsTabs() {
       createdAt: "2025-10-02T14:10:00.000Z",
     },
   ]);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const response = await fetch(
+        `${backendUrl}/settings`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      const data = await response.json();
+      if (!data.user) return;
+      setname(data.user.name ?? "");
+      setemail(data.user.email ?? "");
+      setcompany(data.user.company ?? "");
+      setrole(data.user.role === "admin" ? "admin" : "user");
+    }
+    fetchUser();
+  }, [backendUrl]);
 
   function createKey() {
     const newKey: ApiKey = {
@@ -52,6 +87,36 @@ export function SettingsTabs() {
     toast.success("API key created", {
       description: "Make sure to copy it now — we won't show it again.",
     });
+  }
+ 
+  async function saveProfile() {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/settings`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            company,
+            role,
+          }),
+        },
+      );
+      const data = await response.json();
+      if (data.success) {
+        setProfileSaved(true);
+        window.setTimeout(() => setProfileSaved(false), 1500);
+      } else {
+        toast.error(data.message ?? "Could not save profile");
+      }
+    } catch {
+      toast.error("Could not save profile");
+    }
   }
 
   return (
@@ -71,17 +136,72 @@ export function SettingsTabs() {
               Update how CodePilot displays your account.
             </CardDescription>
           </CardHeader>
-          <CardContent
-            key={user?.id ?? "profile"}
-            className="grid gap-4 sm:grid-cols-2"
-          >
-            <Field label="Full name" defaultValue={user?.name ?? ""} />
-            <Field label="Email" defaultValue={user?.email ?? ""} type="email" />
-            <Field label="Company" defaultValue="" />
-            <Field label="Role" defaultValue="" />
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            {profileSaved ? (
+              <div
+                role="alert"
+                className={cn(
+                  "sm:col-span-2 rounded-lg border border-emerald-500/45 bg-emerald-500/10 px-3 py-2.5 text-sm font-medium text-emerald-100 animate-fade-in",
+                )}
+              >
+                Profile saved
+              </div>
+            ) : null}
+
+            <Field
+              label="Full name"
+              value={name}
+              onChange={(e) => setname(e.target.value)}
+            />
+            <Field
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+            />
+            <Field
+              label="Company"
+              value={company}
+              onChange={(e) => setcompany(e.target.value)}
+            />
+            <label className="space-y-1.5 text-sm">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                Role
+              </span>
+              <Select
+                value={role}
+                onValueChange={(value) =>
+                  setrole(value === "admin" ? "admin" : "user")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </label>
             <div className="sm:col-span-2 flex justify-end">
-              <Button onClick={() => toast.success("Profile saved")}>
+              <Button onClick={saveProfile}>
                 Save changes
+              </Button>
+            </div>
+
+            <Separator className="sm:col-span-2" />
+
+            <div className="sm:col-span-2 flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-destructive">
+                  Delete account
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Permanently remove your account and all associated data.
+                </p>
+              </div>
+              <Button variant="destructive" asChild>
+                <Link href="/settings/delete-account">Delete account</Link>
               </Button>
             </div>
           </CardContent>
@@ -179,8 +299,7 @@ export function SettingsTabs() {
           <CardHeader>
             <CardTitle>Appearance</CardTitle>
             <CardDescription>
-              Theme is dark by default. Light mode is coming soon — toggle saves
-              your preference locally.
+              Turn off dark mode for a brighter interface across the app.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -205,19 +324,18 @@ export function SettingsTabs() {
 
 function Field({
   label,
-  defaultValue,
   type = "text",
+  ...inputProps
 }: {
   label: string;
-  defaultValue?: string;
   type?: string;
-}) {
+} & Omit<React.ComponentProps<typeof Input>, "type">) {
   return (
     <label className="space-y-1.5 text-sm">
       <span className="text-xs uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
-      <Input defaultValue={defaultValue} type={type} />
+      <Input type={type} {...inputProps} />
     </label>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
 import { Toaster as SonnerToaster } from "sonner";
+import type { Theme } from "@/lib/theme";
 
 /**
  * App-wide toast container. Use the `toast()` function from `sonner` to
  * display success / error notifications.
  */
-export function Toaster() {
+export function Toaster({ theme = "dark" }: { theme?: Theme }) {
   return (
     <SonnerToaster
-      theme="dark"
+      theme={theme}
       richColors
       closeButton
       position="bottom-right"
