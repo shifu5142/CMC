@@ -56,6 +56,7 @@ export function DashboardShell({
           method: "GET",
         });
         const data = await response.json();
+        console.log(data);
         if (data.success) {
           setUser({
             id: String(data.data.id),

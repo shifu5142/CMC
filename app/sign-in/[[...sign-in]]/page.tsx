@@ -67,31 +67,27 @@ function SignInPage() {
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
       console.log(user);
-      const token = await user.getIdToken();
       console.log(user.email);
       const response = await fetch(`${backendUrl}/sign-in`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           githubUser: {
-            displayName:
-              user.displayName ||
-              user.providerData?.[0]?.displayName ||
-              user.email?.split("@")[0] ||
-              "User",
             email: user.email,
+            displayName: user.displayName ?? user.email?.split("@")[0],
             avatar: user.photoURL,
-            token: token,
           },
         }),
       });
+      
       const data = await response.json();
-      console.log(data);
+      
       if (data.success) {
-        handleLoginSuccess(token);
-        console.log("redirecting to dashboard");
+        localStorage.setItem("token", data.data.token); // 👈 backend token ONLY
+        setLoginFeedback({
+          success: true,
+          message: "Log in successfully",
+        });
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
