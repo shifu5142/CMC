@@ -17,6 +17,7 @@ type LoginFeedback =
 function SignInPage() {
   const router = useRouter();
   const [loginFeedback, setLoginFeedback] = useState<LoginFeedback>(null);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   useEffect(() => {
     async function checkToken() {
       const token = localStorage.getItem("token");
@@ -24,7 +25,7 @@ function SignInPage() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/sign-in`,
+          `${backendUrl}/sign-in`,
           {
             method: "GET",
             headers: {
@@ -66,18 +67,30 @@ function SignInPage() {
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
       const token = await user.getIdToken();
-      console.log(user);
-      const response = await fetch("/api/sign-in", {
+      console.log(user.email);
+      const response = await fetch(`${backendUrl}/sign-in`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
         method: "POST",
         body: JSON.stringify({
-          username: user.displayName,
           email: user.email,
+          username:
+            user.displayName ||
+            user.providerData?.[0]?.displayName ||
+            user.email?.split("@")[0] ||
+            "",
           image: user.photoURL,
         }),
       });
       const data = await response.json();
+      console.log(data);
       if (data.success) {
         handleLoginSuccess(token);
+        console.log("redirecting to dashboard");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       } else {
         setLoginFeedback({
           success: false,

@@ -20,7 +20,7 @@ import { useUserStore } from "@/store/useUserStore";
 import { getInitials } from "@/lib/utils";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
+console.log("BASE_URL", BASE_URL);
 interface DashboardShellProps {
   children: React.ReactNode;
   title?: string;
@@ -54,6 +54,7 @@ export function DashboardShell({
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
           },
+          method: "GET",
         });
         const data = await response.json();
         if (data.success) {
