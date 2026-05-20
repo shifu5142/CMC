@@ -39,6 +39,28 @@ export function DashboardShell({
   const user = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
   const resetUser = useUserStore((s) => s.reset);
+    useEffect(() => {
+      async function checkToken() {
+        try {
+          const response = await fetch(`${BASE_URL}/review`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          const data = await response.json();
+          if (!data.success) {
+            router.push("/not-found");
+          }
+        } catch (error) {
+          console.error(error);
+          router.push("/not-found");
+        }
+      }
+
+      checkToken();
+    }, [router]);
 
   useEffect(() => {
     async function checkToken() {
@@ -56,7 +78,7 @@ export function DashboardShell({
           method: "GET",
         });
         const data = await response.json();
-        console.log(data);
+
         if (data.success) {
           setUser({
             id: String(data.data.id),
@@ -67,12 +89,12 @@ export function DashboardShell({
             createdAt: new Date().toISOString(),
           });
         } else {
-          router.push("/sign-in");
+          router.push("/not-found");
           localStorage.removeItem("token");
         }
       } catch (error) {
         console.error(error);
-        router.push("/sign-in");
+        router.push("/not-found");
       }
     }
     checkToken();

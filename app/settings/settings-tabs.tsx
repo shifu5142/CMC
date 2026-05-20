@@ -27,6 +27,7 @@ import {
 import { useTheme } from "@/components/layout/theme-provider";
 import { useUserStore } from "@/store/useUserStore";
 import { cn, uid } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface ApiKey {
   id: string;
@@ -44,6 +45,7 @@ export function SettingsTabs() {
   const [company, setcompany] = useState<string>("");
   const [role, setrole] = useState<"user" | "admin">("user");
   const [profileSaved, setProfileSaved] = useState(false);
+  const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const [keys, setKeys] = useState<ApiKey[]>([
     {
@@ -113,9 +115,11 @@ export function SettingsTabs() {
         window.setTimeout(() => setProfileSaved(false), 1500);
       } else {
         toast.error(data.message ?? "Could not save profile");
+        router.push("/not-found");
       }
     } catch {
       toast.error("Could not save profile");
+      router.push("/not-found");
     }
   }
 

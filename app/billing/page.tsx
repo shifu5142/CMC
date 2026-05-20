@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { CheckCircle2, Download, ExternalLink } from "lucide-react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import {
@@ -14,10 +15,8 @@ import { Progress } from "@/components/ui/progress";
 import { PRICING_PLANS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { BillingActions } from "@/app/billing/billing-actions";
-
-export const metadata: Metadata = {
-  title: "Billing",
-};
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const INVOICES = [
   {
@@ -43,7 +42,35 @@ const INVOICES = [
   },
 ];
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 function BillingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchBilling() {
+      try {
+        const response = await fetch(`${backendUrl}/billing`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          router.push("/not-found");
+        }
+      } catch (error) {
+        console.error(error);
+        router.push("/not-found");
+      }
+    }
+
+    fetchBilling();
+  }, [router]);
+
   const currentPlan = PRICING_PLANS.find((p) => p.id === "pro")!;
   const usedReviews = 184;
   const totalReviews = 500;
@@ -71,6 +98,7 @@ function BillingPage() {
               <CheckCircle2 className="size-3" /> Active
             </Badge>
           </CardHeader>
+
           <CardContent className="space-y-4">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-semibold tracking-tight">
@@ -102,11 +130,13 @@ function BillingPage() {
             <CardTitle className="text-base">Payment method</CardTitle>
             <CardDescription>Managed by Stripe.</CardDescription>
           </CardHeader>
+
           <CardContent>
             <div className="rounded-lg border border-border bg-card/40 p-3">
               <p className="text-sm font-medium">Visa •••• 4242</p>
               <p className="text-xs text-muted-foreground">Expires 12/28</p>
             </div>
+
             <Button variant="outline" className="mt-3 w-full">
               <ExternalLink className="size-3.5" />
               Open billing portal
@@ -120,6 +150,7 @@ function BillingPage() {
           <CardTitle className="text-base">Invoices</CardTitle>
           <CardDescription>Download receipts for accounting.</CardDescription>
         </CardHeader>
+
         <CardContent className="p-0">
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase tracking-wider text-muted-foreground">
@@ -131,14 +162,20 @@ function BillingPage() {
                 <th className="px-6 py-3 font-medium" />
               </tr>
             </thead>
+
             <tbody>
               {INVOICES.map((inv) => (
-                <tr key={inv.id} className="border-b border-border/40 last:border-0">
+                <tr
+                  key={inv.id}
+                  className="border-b border-border/40 last:border-0"
+                >
                   <td className="px-6 py-3 font-mono text-xs text-muted-foreground">
                     {inv.date}
                   </td>
                   <td className="px-6 py-3">{inv.description}</td>
-                  <td className="px-6 py-3">{formatCurrency(inv.amount)}</td>
+                  <td className="px-6 py-3">
+                    {formatCurrency(inv.amount)}
+                  </td>
                   <td className="px-6 py-3">
                     <Badge variant="success">{inv.status}</Badge>
                   </td>
