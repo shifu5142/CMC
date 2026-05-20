@@ -81,9 +81,9 @@ function SignInPage() {
               user.providerData?.[0]?.displayName ||
               user.email?.split("@")[0] ||
               "User",
-            Email: user.email,
-            Avatar: user.photoURL,
-            Token: token,
+            email: user.email,
+            avatar: user.photoURL,
+            token: token,
           },
         }),
       });
