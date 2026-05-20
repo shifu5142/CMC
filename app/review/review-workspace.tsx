@@ -25,48 +25,48 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type BackendReviewResult = {
   description: string;
-  code: string;
+  /** Suggested fixed code from the model */
+  fixedCode?: string;
+  /** Legacy / alternate field name */
+  code?: string;
   security?: number;
   performance?: number;
   maintainability?: number;
   score?: number;
-  filename: string;
-  language: string;
-  reviewedAt: string;
+  filename?: string;
+  language?: string;
+  reviewedAt?: string;
 };
 
-function metricValue(value: number | undefined, fallback: number) {
-  if (typeof value !== "number" || Number.isNaN(value)) return fallback;
+/** Use API numbers only; missing or invalid → 0 */
+function strictMetric(value: unknown): number {
+  if (typeof value !== "number" || Number.isNaN(value)) return 0;
   return clamp(Math.round(value), 0, 100);
 }
 
-function reviewFromBackendResponse(result: BackendReviewResult): ReviewResult {
-  const description = result.description ?? "";
-  const titleMatch = description.match(
-    /(?:#{1,3}\s*)?Title:\s*(.+?)(?:\r?\n|$)/i,
-  );
-  const issueCount = (description.match(/^\d+\.\s/gm) ?? []).length;
-  const findings = issueCount || 1;
+function reviewFromBackendResponse(
+  result: BackendReviewResult,
+  fallback: { filename: string; language: string },
+): ReviewResult {
+  const fixedCode = result.fixedCode ?? result.code ?? "";
 
   return {
     id: uid("rev"),
-    language: result.language,
-    filename: result.filename,
-    createdAt: result.reviewedAt,
-    summary:
-      titleMatch?.[1]?.trim() ??
-      `Found ${findings} improvement${findings === 1 ? "" : "s"} in this review.`,
+    language: result.language ?? fallback.language,
+    filename: result.filename ?? fallback.filename,
+    createdAt: result.reviewedAt ?? new Date().toISOString(),
+    summary: "",
     highlights: [],
     metrics: {
-      score: metricValue(result.score, 70),
-      security: metricValue(result.security, 70),
-      performance: metricValue(result.performance, 70),
-      maintainability: metricValue(result.maintainability, 70),
-      estimatedFixTime: findings * 15,
+      score: strictMetric(result.score),
+      security: strictMetric(result.security),
+      performance: strictMetric(result.performance),
+      maintainability: strictMetric(result.maintainability),
+      estimatedFixTime: 0,
     },
     issues: [],
-    reviewDescription: result.description,
-    reviewCode: result.code,
+    reviewDescription: result.description ?? "",
+    reviewCode: fixedCode,
   };
 }
 export function ReviewWorkspace() {
@@ -110,7 +110,10 @@ export function ReviewWorkspace() {
       });
       const data = await result.json();
       if (data.success && data.result) {
-        const reviewResult = reviewFromBackendResponse(data.result);
+        const reviewResult = reviewFromBackendResponse(data.result, {
+          filename: filename ?? "",
+          language,
+        });
         setCurrent(reviewResult);
         pushHistory(reviewResult);
         setStatus("success");

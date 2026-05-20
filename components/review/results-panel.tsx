@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ScoreIndicator } from "@/components/review/score-indicator";
+import { ReviewDescriptionPanel } from "@/components/review/review-description";
 import { IssueCard } from "@/components/review/issue-card";
 import type { IssueCategory, ReviewResult, Severity } from "@/types";
 
@@ -38,48 +39,16 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ResultsHeader({
-  result,
-  counts,
-  findingsCount,
-}: {
-  result: ReviewResult;
-  counts: Record<Severity, number> | null;
-  findingsCount?: number;
-}) {
+function AiGradeHeader({ result }: { result: ReviewResult }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="flex items-center gap-5">
-        <ScoreIndicator score={result.metrics?.score ?? 0} />
+        <ScoreIndicator score={result.metrics.score} />
         <div>
           <CardTitle className="text-base">
-            {result.filename ?? "Review result"}
+            {result.filename?.trim() || "Review result"}
           </CardTitle>
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">
-            {result.summary}
-          </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {findingsCount ? (
-              <Badge variant="outline" className="gap-1">
-                <ListFilter className="size-3" />
-                {findingsCount} finding{findingsCount === 1 ? "" : "s"}
-              </Badge>
-            ) : null}
-            {counts && counts.critical ? (
-              <Badge variant="destructive">{counts.critical} critical</Badge>
-            ) : null}
-            {counts && counts.high ? (
-              <Badge variant="warning">{counts.high} high</Badge>
-            ) : null}
-            {counts && counts.medium ? (
-              <Badge variant="info">{counts.medium} medium</Badge>
-            ) : null}
-            {counts && counts.low ? (
-              <Badge variant="outline">{counts.low} low</Badge>
-            ) : null}
-            {counts && counts.info ? (
-              <Badge variant="secondary">{counts.info} info</Badge>
-            ) : null}
             <Badge variant="secondary" className="capitalize">
               {result.language}
             </Badge>
@@ -88,12 +57,9 @@ function ResultsHeader({
       </div>
 
       <div className="grid w-full max-w-xs gap-2.5">
-        <Metric label="Security" value={result.metrics?.security ?? 0} />
-        <Metric label="Performance" value={result.metrics?.performance ?? 0} />
-        <Metric
-          label="Maintainability"
-          value={result.metrics?.maintainability ?? 0}
-        />
+        <Metric label="Security" value={result.metrics.security} />
+        <Metric label="Performance" value={result.metrics.performance} />
+        <Metric label="Maintainability" value={result.metrics.maintainability} />
       </div>
     </div>
   );
@@ -105,35 +71,20 @@ function AiReviewOutput({
   setAiTab,
 }: {
   result: ReviewResult;
-  aiTab: "description" | "code";
-  setAiTab: (tab: "description" | "code") => void;
+  aiTab: "fixed code" | "description";
+  setAiTab: (tab: "fixed code" | "description") => void;
 }) {
   return (
     <Tabs
       value={aiTab}
-      onValueChange={(v) => setAiTab(v as "description" | "code")}
+      onValueChange={(v) => setAiTab(v as "fixed code" | "description")}
     >
-      <TabsList>
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="fixed code">Fixed Code</TabsTrigger>
         <TabsTrigger value="description">Description</TabsTrigger>
-        <TabsTrigger value="code">Code</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="description" className="mt-4">
-        {result.reviewDescription ? (
-          <div className="max-h-[min(420px,50vh)] overflow-y-auto rounded-lg border border-border/60 bg-card/40 p-4 scrollbar-thin">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-              {result.reviewDescription}
-            </p>
-          </div>
-        ) : (
-          <EmptyState
-            title="No description"
-            description="The review did not return a description."
-          />
-        )}
-      </TabsContent>
-
-      <TabsContent value="code" className="mt-4">
+      <TabsContent value="fixed code" className="mt-4">
         {result.reviewCode ? (
           <pre className="max-h-[min(420px,50vh)] overflow-auto rounded-lg border border-border/60 bg-black/40 p-4 font-mono text-[13px] leading-relaxed text-zinc-200 scrollbar-thin">
             <code>{result.reviewCode}</code>
@@ -141,8 +92,19 @@ function AiReviewOutput({
         ) : (
           <EmptyState
             icon={<FileCode2 className="size-5" />}
-            title="No code"
+            title="No fixed code"
             description="The review did not return fixed code."
+          />
+        )}
+      </TabsContent>
+
+      <TabsContent value="description" className="mt-4">
+        {result.reviewDescription ? (
+          <ReviewDescriptionPanel text={result.reviewDescription} />
+        ) : (
+          <EmptyState
+            title="No description"
+            description="The review did not return a description."
           />
         )}
       </TabsContent>
@@ -150,9 +112,70 @@ function AiReviewOutput({
   );
 }
 
+function LegacyResultsHeader({
+  r,
+  c,
+  fc,
+}: {
+  r: ReviewResult;
+  c: Record<Severity, number> | null;
+  fc?: number;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex items-center gap-5">
+        <ScoreIndicator score={r.metrics?.score ?? 0} />
+        <div>
+          <CardTitle className="text-base">
+            {r.filename ?? "Review result"}
+          </CardTitle>
+          <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            {r.summary}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {fc ? (
+              <Badge variant="outline" className="gap-1">
+                <ListFilter className="size-3" />
+                {fc} finding{fc === 1 ? "" : "s"}
+              </Badge>
+            ) : null}
+            {c && c.critical ? (
+              <Badge variant="destructive">{c.critical} critical</Badge>
+            ) : null}
+            {c && c.high ? (
+              <Badge variant="warning">{c.high} high</Badge>
+            ) : null}
+            {c && c.medium ? (
+              <Badge variant="info">{c.medium} medium</Badge>
+            ) : null}
+            {c && c.low ? (
+              <Badge variant="outline">{c.low} low</Badge>
+            ) : null}
+            {c && c.info ? (
+              <Badge variant="secondary">{c.info} info</Badge>
+            ) : null}
+            <Badge variant="secondary" className="capitalize">
+              {r.language}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid w-full max-w-xs gap-2.5">
+        <Metric label="Security" value={r.metrics?.security ?? 0} />
+        <Metric label="Performance" value={r.metrics?.performance ?? 0} />
+        <Metric
+          label="Maintainability"
+          value={r.metrics?.maintainability ?? 0}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   const [filter, setFilter] = useState<"all" | IssueCategory>("all");
-  const [aiTab, setAiTab] = useState<"description" | "code">("description");
+  const [aiTab, setAiTab] = useState<"fixed code" | "description">("fixed code");
   const issues = result ? getIssues(result) : [];
   const hasAiReview = Boolean(
     result?.reviewDescription ?? result?.reviewCode,
@@ -205,11 +228,7 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
     return (
       <Card glass className="overflow-hidden">
         <CardHeader className="gap-2">
-          <ResultsHeader
-            result={result}
-            counts={counts}
-            findingsCount={findingsCount || 1}
-          />
+          <AiGradeHeader result={result} />
         </CardHeader>
 
         <CardContent>
@@ -229,7 +248,11 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   return (
     <Card glass className="overflow-hidden">
       <CardHeader className="gap-2">
-        <ResultsHeader result={result} counts={counts} />
+        <LegacyResultsHeader
+          r={result}
+          c={counts}
+          fc={findingsCount || undefined}
+        />
       </CardHeader>
 
       <CardContent>
