@@ -66,6 +66,7 @@ function SignInPage() {
     try {
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
+      console.log(user);
       const token = await user.getIdToken();
       console.log(user.email);
       const response = await fetch(`${backendUrl}/sign-in`, {
@@ -74,13 +75,16 @@ function SignInPage() {
         },
         method: "POST",
         body: JSON.stringify({
-          email: user.email,
-          username:
-            user.displayName ||
-            user.providerData?.[0]?.displayName ||
-            user.email?.split("@")[0] ||
-            "",
-          image: user.photoURL,
+          githubUser: {
+            displayName:
+              user.displayName ||
+              user.providerData?.[0]?.displayName ||
+              user.email?.split("@")[0] ||
+              "User",
+            Email: user.email,
+            Avatar: user.photoURL,
+            Token: token,
+          },
         }),
       });
       const data = await response.json();
