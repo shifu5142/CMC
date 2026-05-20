@@ -68,6 +68,7 @@ export function DashboardShell({
           });
         } else {
           router.push("/sign-in");
+          localStorage.removeItem("token");
         }
       } catch (error) {
         console.error(error);
