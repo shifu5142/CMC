@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { FileCode2, ListFilter, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { FileCode2, ListFilter, Sparkles, ShieldAlert } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -21,6 +23,33 @@ import type { IssueCategory, ReviewResult, Severity } from "@/types";
 interface ResultsPanelProps {
   result: ReviewResult | null;
   loading?: boolean;
+  reviewLimitReached?: boolean;
+}
+
+function ReviewLimitBanner() {
+  return (
+    <div className="rounded-xl border border-amber-500/35 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-400">
+            <ShieldAlert className="size-5" aria-hidden />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Daily review limit reached
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Free accounts include 3 reviews per day. Upgrade for unlimited
+              reviews and full access.
+            </p>
+          </div>
+        </div>
+        <Button asChild className="shrink-0">
+          <Link href="/billing/billingPayment">Upgrade plan</Link>
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function getIssues(result: ReviewResult) {
@@ -173,7 +202,11 @@ function LegacyResultsHeader({
   );
 }
 
-export function ResultsPanel({ result, loading }: ResultsPanelProps) {
+export function ResultsPanel({
+  result,
+  loading,
+  reviewLimitReached = false,
+}: ResultsPanelProps) {
   const [filter, setFilter] = useState<"all" | IssueCategory>("all");
   const [aiTab, setAiTab] = useState<"fixed code" | "description">("fixed code");
   const issues = result ? getIssues(result) : [];
@@ -215,6 +248,20 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   }
 
   if (!result) {
+    if (reviewLimitReached) {
+      return (
+        <Card glass className="overflow-hidden">
+          <CardContent className="space-y-4 p-6">
+            <ReviewLimitBanner />
+            <EmptyState
+              icon={<Sparkles className="size-5" />}
+              title="Review limit reached"
+              description="Upgrade your plan to run more reviews today."
+            />
+          </CardContent>
+        </Card>
+      );
+    }
     return (
       <EmptyState
         icon={<Sparkles className="size-5" />}
@@ -227,7 +274,8 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
   if (hasAiReview) {
     return (
       <Card glass className="overflow-hidden">
-        <CardHeader className="gap-2">
+        <CardHeader className="gap-3">
+          {reviewLimitReached ? <ReviewLimitBanner /> : null}
           <AiGradeHeader result={result} />
         </CardHeader>
 
@@ -247,7 +295,8 @@ export function ResultsPanel({ result, loading }: ResultsPanelProps) {
 
   return (
     <Card glass className="overflow-hidden">
-      <CardHeader className="gap-2">
+      <CardHeader className="gap-3">
+        {reviewLimitReached ? <ReviewLimitBanner /> : null}
         <LegacyResultsHeader
           r={result}
           c={counts}

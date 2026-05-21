@@ -1,0 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Subscribe",
+};
+
+export default function BillingPaymentLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
+}

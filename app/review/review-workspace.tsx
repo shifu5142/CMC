@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Play, Sparkles, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -85,9 +85,26 @@ export function ReviewWorkspace() {
   const setChatOpen = useUIStore((s) => s.setChatOpen);
 
   const [rateLimitHits, setRateLimitHits] = useState(0);
+  const [reviewLimitReached, setReviewLimitReached] = useState(false);
   const tooLong = code.length > 18_000;
+  const clickNumber = useRef(0);
 
   async function runReview() {
+    if (localStorage.getItem("reviewLimitReached") === "true") {
+      setReviewLimitReached(true);
+      toast.error("You have reached the maximum number of reviews today. Upgrade to continue.");
+      return;
+    }
+    const nextCount = clickNumber.current + 1;
+    if (nextCount > 3) {
+      setReviewLimitReached(true);
+      localStorage.setItem("reviewLimitReached", "true");
+      toast.error(
+        "You have reached the maximum number of reviews today. Upgrade to continue.",
+      );
+      return;
+    }
+    clickNumber.current = nextCount;
     if (!code.trim()) {
       toast.error("Paste some code first.");
       return;
@@ -214,7 +231,11 @@ export function ReviewWorkspace() {
         </CardContent>
       </Card>
 
-      <ResultsPanel result={current} loading={status === "loading"} />
+      <ResultsPanel
+        result={current}
+        loading={status === "loading"}
+        reviewLimitReached={reviewLimitReached}
+      />
     </div>
   );
 }

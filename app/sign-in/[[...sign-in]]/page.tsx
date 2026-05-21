@@ -45,6 +45,7 @@ function SignInPage() {
           }, 1500);
         }
       } catch (error) {
+        localStorage.removeItem("token");
         console.error(error);
       }
     }
