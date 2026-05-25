@@ -105,6 +105,7 @@ export function DashboardShell({
 
   function signOut() {
     localStorage.removeItem("token");
+    sessionStorage.clear();
     resetUser();
     router.push("/sign-in");
   }
