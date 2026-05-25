@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play, Sparkles, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -22,6 +22,49 @@ import { useUIStore } from "@/store/useUIStore";
 import type { ReviewResult } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const REVIEW_DAILY_KEY = "cmc.reviewDaily";
+const DAILY_REVIEW_LIMIT = 3;
+
+function getLocalDateKey() {
+  const d = new Date();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
+function loadDailyReviewState(): { count: number; limitReached: boolean } {
+  const today = getLocalDateKey();
+  try {
+    const raw = localStorage.getItem(REVIEW_DAILY_KEY);
+    if (!raw) {
+      localStorage.removeItem("reviewLimitReached");
+      return { count: 0, limitReached: false };
+    }
+    const parsed = JSON.parse(raw) as { date?: string; count?: number };
+    if (parsed.date !== today) {
+      localStorage.removeItem(REVIEW_DAILY_KEY);
+      localStorage.removeItem("reviewLimitReached");
+      return { count: 0, limitReached: false };
+    }
+    const count =
+      typeof parsed.count === "number" && parsed.count >= 0 ? parsed.count : 0;
+    return { count, limitReached: count >= DAILY_REVIEW_LIMIT };
+  } catch {
+    return { count: 0, limitReached: false };
+  }
+}
+
+function saveDailyReviewState(count: number) {
+  localStorage.setItem(
+    REVIEW_DAILY_KEY,
+    JSON.stringify({ date: getLocalDateKey(), count }),
+  );
+  if (count >= DAILY_REVIEW_LIMIT) {
+    localStorage.setItem("reviewLimitReached", "true");
+  } else {
+    localStorage.removeItem("reviewLimitReached");
+  }
+}
 
 type BackendReviewResult = {
   description: string;
@@ -89,22 +132,34 @@ export function ReviewWorkspace() {
   const tooLong = code.length > 18_000;
   const clickNumber = useRef(0);
 
+  useEffect(() => {
+    const daily = loadDailyReviewState();
+    clickNumber.current = daily.count;
+    setReviewLimitReached(daily.limitReached);
+  }, []);
+
   async function runReview() {
-    if (localStorage.getItem("reviewLimitReached") === "true") {
+    const daily = loadDailyReviewState();
+    clickNumber.current = daily.count;
+
+    if (daily.limitReached) {
       setReviewLimitReached(true);
-      toast.error("You have reached the maximum number of reviews today. Upgrade to continue.");
-      return;
-    }
-    const nextCount = clickNumber.current + 1;
-    if (nextCount > 3) {
-      setReviewLimitReached(true);
-      localStorage.setItem("reviewLimitReached", "true");
       toast.error(
         "You have reached the maximum number of reviews today. Upgrade to continue.",
       );
       return;
     }
-    clickNumber.current = nextCount;
+
+    const nextCount = clickNumber.current + 1;
+    if (nextCount > DAILY_REVIEW_LIMIT) {
+      clickNumber.current = DAILY_REVIEW_LIMIT;
+      saveDailyReviewState(DAILY_REVIEW_LIMIT);
+      setReviewLimitReached(true);
+      toast.error(
+        "You have reached the maximum number of reviews today. Upgrade to continue.",
+      );
+      return;
+    }
     if (!code.trim()) {
       toast.error("Paste some code first.");
       return;
@@ -113,6 +168,9 @@ export function ReviewWorkspace() {
       toast.error("Code is too long. Trim to under 20,000 chars.");
       return;
     }
+
+    clickNumber.current = nextCount;
+    saveDailyReviewState(nextCount);
     setStatus("loading");
     setCurrent(null);
     try {

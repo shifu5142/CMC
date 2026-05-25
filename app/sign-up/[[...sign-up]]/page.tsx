@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { auth, githubProvider } from "@/app/services/auth/firebaseConfig";
+import { signInWithPopup } from "firebase/auth";
 type RegisterFeedback =
   | null
   | { success: true; message: string }
@@ -24,6 +25,51 @@ function SignUpPage() {
   const [registerFeedback, setRegisterFeedback] =
     useState<RegisterFeedback>(null);
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const handleGithubSignIn = async () => {
+    setRegisterFeedback(null);
+    try {
+      const result = await signInWithPopup(auth, githubProvider);
+      const user = result.user;
+      console.log(user);
+      console.log(user.email);
+      const response = await fetch(`${backendUrl}/sign-in`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          githubUser: {
+            email: user.email,
+            displayName: user.displayName ?? user.email?.split("@")[0],
+            avatar: user.photoURL,
+          },
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        localStorage.setItem("token", data.data.token); // 👈 backend token ONLY
+        setRegisterFeedback({
+          success: true,
+          message: "Log in successfully",
+        });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      } else {
+        setRegisterFeedback({
+          success: false,
+          message: data.message?.trim() || "Log in rejected",
+        });
+        console.error(data.message);
+      }
+    } catch (error) {
+      setRegisterFeedback({
+        success: false,
+        message: "Log in rejected",
+      });
+      console.error(error);
+    }
+  };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegisterFeedback(null);
@@ -104,10 +150,7 @@ function SignUpPage() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => {
-                toast.info("OAuth is mocked — landing on dashboard.");
-                router.push("/dashboard");
-              }}
+              onClick={handleGithubSignIn}
             >
               <Github className="size-4" />
               Continue with GitHub

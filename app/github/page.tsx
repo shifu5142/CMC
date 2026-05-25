@@ -20,6 +20,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { mockCommits, mockPRs, mockRepos } from "@/lib/mock-data";
 import { formatNumber, formatRelativeTime, cn } from "@/lib/utils";
+import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../services/auth/firebaseConfig";
 
 export const metadata: Metadata = {
   title: "GitHub",
@@ -31,6 +33,7 @@ const STATUS_BADGE = {
   closed: "destructive" as const,
   draft: "secondary" as const,
 };
+
 
 function GitHubPage() {
   return (
