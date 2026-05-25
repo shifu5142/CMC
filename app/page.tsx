@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import Hero from "@/components/landing/hero";
+import DashboardPreview from "@/components/landing/dashboard-preview";
 import Features from "@/components/landing/features";
 import LogoCloud from "@/components/landing/logo-cloud";
 import PricingSection from "@/components/landing/pricing-section";
@@ -13,6 +14,7 @@ function LandingPage() {
       <Navbar />
       <main>
         <Hero />
+        <DashboardPreview />
         <LogoCloud />
         <Features />
         <PricingSection />
